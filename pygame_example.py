@@ -16,7 +16,7 @@ from OpenGL.GLU import *
 def gl_init( screen_size ):
    """
    Initialize OpenGL.
-        """
+   """
    screen = pygame.display.set_mode( screen_size, HWSURFACE | OPENGL | DOUBLEBUF )
 
    glViewport( 0, 0, screen_size[ 0 ], screen_size[ 1 ] )
@@ -37,6 +37,7 @@ def main():
    gl_init( [ 640, 480 ] )
 
    while 1:
+
       glClearColor( 0.5, 0.5, 0.5, 1 )
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
       glLoadIdentity()
@@ -45,32 +46,14 @@ def main():
       gluLookAt( 5, 5, 5, 0, 0, 0, 0, 0, 1 )
 
       # Draw x-axis line.
-      glColor3f( 1, 0, 0 )
+      glColor3f( 0, 1, 0 )
 
       glBegin( GL_LINES )
       glVertex3f( 0, 0, 0 )
       glVertex3f( 1, 0, 0 )
       glEnd()
 
-      # Draw y-axis line.
-      glColor3f( 0, 1, 0 )
-
-      glBegin( GL_LINES )
-      glVertex3f( 0, 0, 0 )
-      glVertex3f( 0, 1, 0 )
-      glEnd()
-
-      # Draw z-axis line.
-      glColor3f( 0, 0, 1 )
-
-      glBegin( GL_LINES )
-      glVertex3f( 0, 0, 0 )
-      glVertex3f( 0, 0, 1 )
-      glEnd()
-
       pygame.display.flip()
-      print "blah"
-      time.sleep(2)
 
 if __name__ == '__main__':
    main()
