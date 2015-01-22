@@ -1,0 +1,3 @@
+[submodule "piksi_firmware"]
+	path = piksi_firmware
+	url = https://github.com/swift-nav/piksi_firmware
