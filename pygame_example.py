@@ -33,12 +33,12 @@ def gl_init( screen_size ):
    glMatrixMode( GL_MODELVIEW )
    glLoadIdentity()
 
-def update_line(n,e,d): 
-  # Set color.  
+def update_line(n,e,d):
+  # Set color.
   glColor3f(0,1,0)
-
+  # Calculate magnitude of vector.
   mag = np.sqrt(n**2.0 + e**2.0 + d**2.0)
-
+  # Draw line, normalizing length.
   glBegin(GL_LINES)
   glVertex3f(0,0,0)
   glVertex3f(n/mag,e/mag,-d/mag)
@@ -48,7 +48,9 @@ def main():
   pygame.init()
   gl_init( [ 640, 480 ] )
 
+  # Test vector.
   i = 0
+  k = 0
 
   while 1:
 
@@ -59,30 +61,31 @@ def main():
     # Position camera to look at the world origin.
     gluLookAt( 5, 5, 5, 0, 0, 0, 0, 0, 1)
 
-    # Update vector
+    # Update test vector.
     i = (i+0.1)%(2*np.pi)
+    k = (i+0.15)%(2*np.pi)
     n = np.cos(i)
     e = np.sin(i)
-    
+    d = np.cos(k)
+
     # Draw baseline
-    update_line(n,e,0)
+    update_line(n,e,d)
 
     pygame.display.flip()
-    time.sleep(0.1)
-    # while True:
+
+    # Exit gracefully if quit button is pressed.
     eventlist = pygame.event.get()
     try:
       event = eventlist.pop(0)
       while event:
         if event.type == pygame.QUIT:
-          pygame.display.quit()   #break
+          pygame.display.quit()
           return
         event = eventlist.pop(0)
     except IndexError:
       pass
-         
-  #while 1:
-  #  time.sleep(1)
+
+    time.sleep(0.1)
 
 if __name__ == '__main__':
    main()
