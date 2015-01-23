@@ -1,9 +1,7 @@
 """
-PyOpenGL/pygame simple 3d viewport.
+Pygame/PyOpenGL simple 3d viewport.
 
-Author: Jason Hayes (j.hayes@me.com)
-Description: Creates a simple 3d viewport utilizing PyOpenGL and pygame.
-Version: 1.0
+Based on Pygame/PyOpenGL example by Jason Hayes (j.hayes@me.com)
 """
 
 import pygame
@@ -13,6 +11,26 @@ import time
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
+
+import sys
+sys.path.append('piksi_firmware/scripts')
+import serial_link
+import baseline_view
+import sbp_piksi as sbp_messages
+
+class BaselineCallback():
+   def __init__(self):
+      self.soln = None
+
+   def callback(self, data):
+      self.soln = sbp_messages.BaselineNED(data)
+
+      self.soln.n = self.soln.n * 1e-3
+      self.soln.e = self.soln.e * 1e-3
+      self.soln.d = self.soln.d * 1e-3
+      print self.soln.n
+      print self.soln.e
+      print self.soln.d
 
 def gl_init( screen_size ):
    """
@@ -45,8 +63,27 @@ def update_line(n,e,d):
   glEnd()
 
 def main():
+  import argparse
+  parser = argparse.ArgumentParser(description='Swift Nav Serial Link.')
+  parser.add_argument('-p', '--port',
+                      default=[serial_link.DEFAULT_PORT],
+                      nargs=1,
+                      help='specify the serial port to use.')
+  parser.add_argument("-b", "--baud",
+                      default=[serial_link.DEFAULT_BAUD], nargs=1,
+                      help="specify the baud rate to use.")
+  args = parser.parse_args()
+  serial_port = args.port[0]
+  baud = args.baud[0]
+
   pygame.init()
   gl_init( [ 640, 480 ] )
+
+  baseline = BaselineCallback()
+
+  link = serial_link.SerialLink(serial_port, baud)
+  link.add_callback(sbp_messages.SBP_BASELINE_NED, baseline.callback)
+  link.add_callback(sbp_messages.PRINT, serial_link.default_print_callback)
 
   # Test vector.
   i = 0
