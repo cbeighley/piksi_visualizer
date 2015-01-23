@@ -16,7 +16,6 @@ import numpy as np
 import sys
 sys.path.append('piksi_firmware/scripts')
 import serial_link
-import baseline_view
 import sbp_piksi as sbp_messages
 
 NORM_MAG = 3
