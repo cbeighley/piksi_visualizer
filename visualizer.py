@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Pygame/PyOpenGL simple 3d viewport.
 
@@ -18,19 +19,21 @@ import serial_link
 import baseline_view
 import sbp_piksi as sbp_messages
 
+NORM_MAG = 3
+
 class BaselineCallback():
+
    def __init__(self):
-      self.soln = None
+      self.n = 0
+      self.e = 0
+      self.d = 0
 
    def callback(self, data):
-      self.soln = sbp_messages.BaselineNED(data)
+      soln = sbp_messages.BaselineNED(data)
 
-      self.soln.n = self.soln.n * 1e-3
-      self.soln.e = self.soln.e * 1e-3
-      self.soln.d = self.soln.d * 1e-3
-      print self.soln.n
-      print self.soln.e
-      print self.soln.d
+      self.n = soln.n * 1e-3
+      self.e = soln.e * 1e-3
+      self.d = soln.d * 1e-3
 
 def gl_init( screen_size ):
    """
@@ -55,7 +58,7 @@ def update_line(n,e,d):
   # Set color.
   glColor3f(0,1,0)
   # Calculate magnitude of vector.
-  mag = np.sqrt(n**2.0 + e**2.0 + d**2.0)
+  mag = np.sqrt(n**2.0 + e**2.0 + d**2.0)/NORM_MAG
   # Draw line, normalizing length.
   glBegin(GL_LINES)
   glVertex3f(0,0,0)
@@ -85,10 +88,6 @@ def main():
   link.add_callback(sbp_messages.SBP_BASELINE_NED, baseline.callback)
   link.add_callback(sbp_messages.PRINT, serial_link.default_print_callback)
 
-  # Test vector.
-  i = 0
-  k = 0
-
   while 1:
 
     glClearColor( 0.5, 0.5, 0.5, 1 )
@@ -98,15 +97,8 @@ def main():
     # Position camera to look at the world origin.
     gluLookAt( 5, 5, 5, 0, 0, 0, 0, 0, 1)
 
-    # Update test vector.
-    i = (i+0.1)%(2*np.pi)
-    k = (i+0.15)%(2*np.pi)
-    n = np.cos(i)
-    e = np.sin(i)
-    d = np.cos(k)
-
     # Draw baseline
-    update_line(n,e,d)
+    update_line(baseline.n,baseline.e,baseline.d)
 
     pygame.display.flip()
 
@@ -122,7 +114,7 @@ def main():
     except IndexError:
       pass
 
-    time.sleep(0.1)
+    time.sleep(0.01)
 
 if __name__ == '__main__':
    main()
